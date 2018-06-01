@@ -2,6 +2,21 @@
 {
     public class GameManager
     {
+        public enum eGameStatus
+        {
+            Playing,
+            Win,
+            Draw,
+            Forfit
+        }
+
+        public enum eBoardSize
+        {
+            Samll = 6,
+            Medium = 8,
+            Large = 10
+        }
+
         private const int k_MaxNameSize = 20;
         private readonly Player r_Player1;
         private readonly Player r_Player2;
@@ -25,7 +40,7 @@
             m_BoardSize = r_UI.GetUserBoardSize(Board.AllowedBoardSizes);
 
             r_Player2.PlayerType = r_UI.GetPlayerType();
-            r_Player2.Name = r_Player2.PlayerType == ePlayerType.Human
+            r_Player2.Name = r_Player2.PlayerType == Player.ePlayerType.Human
                                  ? r_UI.GetUserNameInput(k_MaxNameSize)
                                  : "Computer";
 
@@ -59,11 +74,11 @@
                 r_UI.PrintLastMove(otherPlayer());
 
                 // Get a players move and preform it
-                Move currentMove = getMove(previousMove, out eMoveStatus currentMoveStatus);
+                Move currentMove = getMove(previousMove, out Move.eMoveStatus currentMoveStatus);
                 m_CurrentPlayer.AddMove(currentMove);
 
                 // If the player can not preform another jump, change player
-                if (currentMoveStatus == eMoveStatus.AnotherJumpPossible)
+                if (currentMoveStatus == Move.eMoveStatus.AnotherJumpPossible)
                 {
                     previousMove = m_CurrentPlayer.GetLastMove();
                 }
@@ -111,19 +126,19 @@
             r_UI.PointStatus(r_Player1.Name, r_Player1.Points, r_Player2.Name, r_Player2.Points);
         }
 
-        private Move getMove(Move i_PreviousMove, out eMoveStatus o_MoveStatus)
+        private Move getMove(Move i_PreviousMove, out Move.eMoveStatus o_MoveStatus)
         {
             Move currentMove = null;
-            eMoveStatus currentMoveStatus = eMoveStatus.Illegal;
-            if (m_CurrentPlayer.PlayerType == ePlayerType.Human)
+            Move.eMoveStatus currentMoveStatus = Move.eMoveStatus.Illegal;
+            if (m_CurrentPlayer.PlayerType == Player.ePlayerType.Human)
             {
-                while (currentMoveStatus == eMoveStatus.Illegal)
+                while (currentMoveStatus == Move.eMoveStatus.Illegal)
                 {
                     currentMove = r_UI.GetUserMoveInput(m_CurrentPlayer, out bool forfitFlag);
                     if (forfitFlag)
                     {
                         m_Board.PlayerForfit(m_CurrentPlayer, out currentMoveStatus);
-                        if (currentMoveStatus == eMoveStatus.Illegal)
+                        if (currentMoveStatus == Move.eMoveStatus.Illegal)
                         {
                             r_UI.NotAllowedForfit();
                         }
@@ -131,7 +146,7 @@
                     else
                     {
                         m_Board.MovePiece(ref currentMove, i_PreviousMove, out currentMoveStatus);
-                        if (currentMoveStatus == eMoveStatus.Illegal)
+                        if (currentMoveStatus == Move.eMoveStatus.Illegal)
                         {
                             r_UI.InValidMove();
                         }

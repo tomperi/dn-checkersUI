@@ -4,8 +4,14 @@ namespace checkers
 {
     public class Player
     {
+        public enum ePlayerType
+        {
+            Human,
+            Computer
+        }
+
         private readonly ePlayerPosition r_PlayerPosition;
-        private readonly List<Move> r_MoveHistory;
+        private List<Move> m_MoveHistory;
         private string m_Name;
         private ePlayerType m_PlayerType;
         private int m_Points;
@@ -13,7 +19,7 @@ namespace checkers
         public Player(ePlayerPosition i_PlayerPosition)
         {
             r_PlayerPosition = i_PlayerPosition;
-            r_MoveHistory = new List<Move>();
+            m_MoveHistory = new List<Move>();
         }
 
         public string Name
@@ -65,20 +71,20 @@ namespace checkers
 
         public void ClearMoveHistory()
         {
-            r_MoveHistory = new List<Move>();
+            m_MoveHistory = new List<Move>();
         }
 
         public void AddMove(Move i_Move)
         {
-            r_MoveHistory.Add(i_Move);
+            m_MoveHistory.Add(i_Move);
         }
 
         public Move GetLastMove()
         {
             Move lastMove = null;
-            if (r_MoveHistory.Count > 0)
+            if (m_MoveHistory.Count > 0)
             {
-                lastMove = r_MoveHistory[r_MoveHistory.Count - 1];
+                lastMove = m_MoveHistory[m_MoveHistory.Count - 1];
             }
 
             return lastMove;

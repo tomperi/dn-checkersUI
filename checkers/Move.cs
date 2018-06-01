@@ -4,6 +4,19 @@ namespace checkers
 {
     public class Move
     {
+        public enum eMoveType
+        {
+            Regular,
+            Jump
+        }
+
+        public enum eMoveStatus
+        {
+            Legal,
+            Illegal,
+            AnotherJumpPossible
+        }
+
         private readonly Position r_Begin;
         private readonly Position r_End;
         private ePlayerPosition? m_Player;

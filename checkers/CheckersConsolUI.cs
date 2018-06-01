@@ -189,23 +189,23 @@ namespace checkers
             return size;
         }
 
-        public ePlayerType GetPlayerType()
+        public Player.ePlayerType GetPlayerType()
         {
             printMessage(Strings.ChoosePlayer);
             string userInput = getInputFromUser().ToLower();
             bool validPlayerType = false;
-            ePlayerType choosenPlayerType = ePlayerType.Human;
+            Player.ePlayerType choosenPlayerType = Player.ePlayerType.Human;
 
             while (!validPlayerType)
             {
                 if (userInput == k_ComputerSymbol.ToString())
                 {
-                    choosenPlayerType = ePlayerType.Computer;
+                    choosenPlayerType = Player.ePlayerType.Computer;
                     validPlayerType = true;
                 }
                 else if (userInput == k_HumenSymbol.ToString())
                 {
-                    choosenPlayerType = ePlayerType.Human;
+                    choosenPlayerType = Player.ePlayerType.Human;
                     validPlayerType = true;
                 }
                 else

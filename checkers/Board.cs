@@ -5,6 +5,13 @@ namespace checkers
 {
     public class Board
     {
+        public enum eSquareStatus
+        {
+            Empty,
+            OutOfBounds,
+            Occupied
+        }
+
         private const int k_KingPointsWorth = 4;
         private const int k_RegularPointsWorth = 1;
         private const int k_Difficulty = 3;
@@ -42,7 +49,7 @@ namespace checkers
 
         private static bool notJump(Move i_Movemove)
         {
-            return i_Movemove.Type != eMoveType.Jump;
+            return i_Movemove.Type != Move.eMoveType.Jump;
         }
 
         private void initBoard()
@@ -73,26 +80,26 @@ namespace checkers
             }
         }
 
-        public void MovePiece(ref Move io_Move, Move i_PreviousMove, out eMoveStatus o_MoveStatus)
+        public void MovePiece(ref Move io_Move, Move i_PreviousMove, out Move.eMoveStatus o_MoveStatus)
         {
-            o_MoveStatus = eMoveStatus.Illegal;
+            o_MoveStatus = Move.eMoveStatus.Illegal;
             if (checkMoveLegality(ref io_Move, i_PreviousMove))
             {
-                o_MoveStatus = eMoveStatus.Legal;
+                o_MoveStatus = Move.eMoveStatus.Legal;
                 changePiecePosition(io_Move);
                 checkKing(io_Move.End);
-                if (io_Move.Type == eMoveType.Jump)
+                if (io_Move.Type == Move.eMoveType.Jump)
                 {
                     removedJumpedOverPiece(io_Move);
                     if (isJumpPossible(possibleMovesForPiece(io_Move.End), out List<Move> jumpsList))
                     {
-                        o_MoveStatus = eMoveStatus.AnotherJumpPossible;
+                        o_MoveStatus = Move.eMoveStatus.AnotherJumpPossible;
                     }
                 }
             }
             else
             {
-                o_MoveStatus = eMoveStatus.Illegal;
+                o_MoveStatus = Move.eMoveStatus.Illegal;
             }
         }
 
@@ -170,7 +177,7 @@ namespace checkers
             bool multipleJumpsPossible = false;
 
             // If the last move was a jump, first check if another jump is possible for that piece
-            if (i_LastMove != null && i_LastMove.Type == eMoveType.Jump)
+            if (i_LastMove != null && i_LastMove.Type == Move.eMoveType.Jump)
             {
                 possibleMoves = possibleMovesForPiece(i_LastMove.End);
                 if (possibleMoves != null)
@@ -214,7 +221,7 @@ namespace checkers
 
             foreach (Move move in i_AllMovesList)
             {
-                if (move.Type == eMoveType.Jump)
+                if (move.Type == Move.eMoveType.Jump)
                 {
                     jumpPossible = true;
                 }
@@ -291,7 +298,7 @@ namespace checkers
                 eSquareStatus squareStatus = checkSquareStatus(endPosition, out ePlayerPosition squarePlayer);
                 if (squareStatus == eSquareStatus.Empty)
                 {
-                    regularMovesList.Add(new Move(i_StartPosition, endPosition, i_Player, eMoveType.Regular));
+                    regularMovesList.Add(new Move(i_StartPosition, endPosition, i_Player, Move.eMoveType.Regular));
                 }
                 else if (squareStatus == eSquareStatus.Occupied && squarePlayer != i_Player)
                 {
@@ -301,7 +308,7 @@ namespace checkers
                     eSquareStatus jumpSquareStatus = checkSquareStatus(jumpPosition, out squarePlayer);
                     if (jumpSquareStatus == eSquareStatus.Empty)
                     {
-                        regularMovesList.Add(new Move(i_StartPosition, jumpPosition, i_Player, eMoveType.Jump));
+                        regularMovesList.Add(new Move(i_StartPosition, jumpPosition, i_Player, Move.eMoveType.Jump));
                     }
                 }
                 else if (squareStatus == eSquareStatus.OutOfBounds)
@@ -349,7 +356,7 @@ namespace checkers
             }
         }
 
-        public eGameStatus GetGameStatus(Player i_CurrentPlayer, out ePlayerPosition o_Winner)
+        public GameManager.eGameStatus GetGameStatus(Player i_CurrentPlayer, out ePlayerPosition o_Winner)
         {
             // Check the current game status
             // Win -> The current player has no possible moves, the other player wins
@@ -357,7 +364,7 @@ namespace checkers
             //        The current player has forfited and has fewer points, the other player wins
             // Draw -> Both players have no possible moves 
             //         A player has forfited when the scoring is a tie 
-            eGameStatus currentStatus = eGameStatus.Playing;
+            GameManager.eGameStatus currentStatus = GameManager.eGameStatus.Playing;
             ePlayerPosition winner = ePlayerPosition.TopPlayer;
 
             if (m_PlayerHasForfit)
@@ -367,11 +374,11 @@ namespace checkers
                                   : ePlayerPosition.TopPlayer;
                 if (GetPlayerScore(m_PlayerForfit) == GetPlayerScore(otherPlayer))
                 {
-                    currentStatus = eGameStatus.Draw;
+                    currentStatus = GameManager.eGameStatus.Draw;
                 }
                 else
                 {
-                    currentStatus = eGameStatus.Forfit;
+                    currentStatus = GameManager.eGameStatus.Forfit;
                     winner = otherPlayer;
                 }
             }
@@ -388,10 +395,10 @@ namespace checkers
                 // In case one of the players has no move, the game is either a draw or a win
                 if (currentPlayerPossibleMoves == 0 || otherPlayerPossibleMoves == 0)
                 {
-                    currentStatus = eGameStatus.Draw;
+                    currentStatus = GameManager.eGameStatus.Draw;
                     if (otherPlayerPossibleMoves != 0)
                     {
-                        currentStatus = eGameStatus.Win;
+                        currentStatus = GameManager.eGameStatus.Win;
                         winner = otherPlayer;
                     }
                 }
@@ -416,7 +423,7 @@ namespace checkers
             return i_Player == ePlayerPosition.BottomPlayer ? m_BottomPlayerPoints : m_TopPlayerPoints;
         }
 
-        public void PlayerForfit(Player i_PlayerForfit, out eMoveStatus i_CurrentMoveStatus)
+        public void PlayerForfit(Player i_PlayerForfit, out Move.eMoveStatus i_CurrentMoveStatus)
         {
             int forfitPlayerPoints = i_PlayerForfit.PlayerPosition == ePlayerPosition.BottomPlayer
                                          ? m_BottomPlayerPoints
@@ -426,13 +433,13 @@ namespace checkers
                                         : m_BottomPlayerPoints;
             if (forfitPlayerPoints <= otherPlayerPoints)
             {
-                i_CurrentMoveStatus = eMoveStatus.Legal;
+                i_CurrentMoveStatus = Move.eMoveStatus.Legal;
                 m_PlayerHasForfit = true;
                 m_PlayerForfit = i_PlayerForfit.PlayerPosition;
             }
             else
             {
-                i_CurrentMoveStatus = eMoveStatus.Illegal;
+                i_CurrentMoveStatus = Move.eMoveStatus.Illegal;
             }
         }
     }
