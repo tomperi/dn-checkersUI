@@ -1,4 +1,7 @@
-﻿namespace checkers
+﻿using System.Diagnostics;
+using System.Windows.Forms;
+
+namespace checkers
 {
     public class GameManager
     {
@@ -12,7 +15,7 @@
 
         public enum eBoardSize
         {
-            Samll = 6,
+            Small = 6,
             Medium = 8,
             Large = 10
         }
@@ -21,6 +24,7 @@
         private readonly Player r_Player1;
         private readonly Player r_Player2;
         private readonly CheckersConsolUI r_UI;
+        private readonly CheckersGUI r_GUI;
         private Board m_Board;
         private int m_BoardSize;
         private Player m_CurrentPlayer;
@@ -31,25 +35,27 @@
             r_Player2 = new Player(ePlayerPosition.TopPlayer);
             m_CurrentPlayer = r_Player1;
             r_UI = new CheckersConsolUI();
+            r_GUI = new CheckersGUI();
         }
 
         public void Start()
         {
-            r_Player1.Name = r_UI.GetUserNameInput(k_MaxNameSize);
-
-            m_BoardSize = r_UI.GetUserBoardSize(Board.AllowedBoardSizes);
-
-            r_Player2.PlayerType = r_UI.GetPlayerType();
-            r_Player2.Name = r_Player2.PlayerType == Player.ePlayerType.Human
-                                 ? r_UI.GetUserNameInput(k_MaxNameSize)
-                                 : "Computer";
+            // Get the game settings from the user
+            GameSettingsForm gameSettings = new GameSettingsForm();
+            if (gameSettings.ShowDialog() == DialogResult.OK)
+            {
+                m_BoardSize = (int) gameSettings.BoardSize;
+                r_Player1.Name = gameSettings.Player1Name;
+                r_Player2.Name = gameSettings.Player2Name;
+                r_Player2.PlayerType = gameSettings.Player2Type;
+            }
 
             bool continuePlaying = true;
 
             while (continuePlaying)
             {
                 playSingleGame();
-                continuePlaying = r_UI.GetUserAnotherGameInput();
+                continuePlaying = r_UI.GetUserAnotherGameInput(); // Change with GUI 
             }
 
             r_UI.EndGameMessage();
