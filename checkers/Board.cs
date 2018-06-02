@@ -14,7 +14,6 @@ namespace checkers
 
         private const int k_KingPointsWorth = 4;
         private const int k_RegularPointsWorth = 1;
-        private const int k_Difficulty = 3;
         private static readonly int[] sr_AllowedBoardSizes = { 6, 8, 10 };
         private readonly int r_Size;
 
@@ -39,6 +38,7 @@ namespace checkers
             initBoard();
         }
 
+        /* TODO: Delete this
         private Board(Piece[,] i_BoardMatrix, int i_TopPlayerPoints, int i_BottomPlayerPoints)
         {
             r_BoardMatrix = i_BoardMatrix;
@@ -46,6 +46,7 @@ namespace checkers
             m_TopPlayerPoints = i_TopPlayerPoints;
             m_BottomPlayerPoints = i_BottomPlayerPoints;
         }
+        */
 
         private static bool notJump(Move i_Movemove)
         {

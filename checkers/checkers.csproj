@@ -34,19 +34,22 @@
     <Compile Include="Board.cs" />
     <Compile Include="CheckersConsolUI.cs" />
     <Compile Include="CheckersGUI.cs" />
-    <Compile Include="GameBoard.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="GameManager.cs" />
     <Compile Include="GameSettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="MainGame.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Move.cs" />
+    <Compile Include="ActiveSquare.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Piece.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Position.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="Square.cs">
+    <Compile Include="NonActiveSquare.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Strings.cs" />
@@ -62,6 +65,15 @@
   <ItemGroup>
     <EmbeddedResource Include="GameSettingsForm.resx">
       <DependentUpon>GameSettingsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainGame.resx">
+      <DependentUpon>MainGame.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ActiveSquare.resx">
+      <DependentUpon>ActiveSquare.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NonActiveSquare.resx">
+      <DependentUpon>NonActiveSquare.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

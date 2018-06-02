@@ -10,15 +10,7 @@ namespace checkers
     {
         public void GetGameSettings()
         {
-            // Create a form with the following options - 
-            // Board size - 6x6, 8x8, 10x10 (Radio button)
-            // Player 1 name
-            // Player 2 checkbox (for computer) / name (for player)
-            GameSettingsForm gameSettings = new GameSettingsForm();
-            if (gameSettings.ShowDialog() == DialogResult.OK)
-            {
-                
-            }
+
         }
 
         public void PrintBoard(Piece[,] i_Board)

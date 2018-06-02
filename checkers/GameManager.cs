@@ -40,6 +40,10 @@ namespace checkers
 
         public void Start()
         {
+            // Test MainGame window
+            MainGame mainGame = new MainGame(m_Board.BoardMatrix);
+            mainGame.ShowDialog();
+            
             // Get the game settings from the user
             GameSettingsForm gameSettings = new GameSettingsForm();
             if (gameSettings.ShowDialog() == DialogResult.OK)
