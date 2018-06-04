@@ -1,25 +1,49 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Drawing;
+using checkers;
 
-namespace checkers
+namespace checkersGUI
 {
     public class MainGame : Form
     {
-        private Label labelPlayer2Score;
-        private Label labelPlayer1Score;
-        private List<ActiveSquare> listOfSquares;
-
-        public MainGame(Piece[,] i_Board)
+        public enum eBoardSize
         {
-            listOfSquares = new List<ActiveSquare>();
-            InitializeComponent(i_Board);
+            Small = 6,
+            Medium = 8,
+            Large = 10
         }
 
-        private void InitializeComponent(Piece[,] i_Board)
+        private FormGameSettings formGameSettings;
+        private Label labelPlayer2Score;
+        private Label labelPlayer1Score;
+        private BoardGUI boardGUI;
+
+        public MainGame()
+        {
+            GetUserSettings();
+            InitializeComponent();
+        }
+
+        private void GetUserSettings()
+        {
+            formGameSettings = new FormGameSettings();
+            if (formGameSettings.ShowDialog() == DialogResult.OK)
+            {
+                // Do something with the settings
+            }
+            else
+            {
+                // Close the entire app
+            }
+
+        }
+
+        private void InitializeComponent()
         {
             labelPlayer1Score = new System.Windows.Forms.Label();
             labelPlayer2Score = new System.Windows.Forms.Label();
+            boardGUI = new BoardGUI(8);
             SuspendLayout();
 
             // labelPlayer1Score
@@ -38,39 +62,19 @@ namespace checkers
             labelPlayer2Score.TabIndex = 1;
             labelPlayer2Score.Text = "Player 2: <Score>";
 
+            // boardGui
+            boardGUI.Top = 50;
+            boardGUI.Left = 50;
+
             // MainGame
             ClientSize = new System.Drawing.Size(284, 261);
             Controls.Add(this.labelPlayer2Score);
             Controls.Add(this.labelPlayer1Score);
+            Controls.Add(boardGUI);
             Name = "MainGame";
             Text = "Damka";
             ResumeLayout(false);
             PerformLayout();
-
-            int dimension = i_Board.GetLength(0);
-
-            // Print the board
-            for (int i = 0; i < dimension; i++)
-            {
-                for (int j = 0; j < dimension; j++)
-                {
-                    if (i_Board[i, j] != null)
-                    {
-                        // Create an empty button
-                        ActiveSquare newSquare = new ActiveSquare(i_Board[i, j].PlayerPosition, i_Board[i, j].PieceSymbol, true, new Position(i, j));
-                        listOfSquares.Add(newSquare);
-                        Controls.Add(newSquare);
-                    }
-                    else
-                    {
-                        // Create a non empty button
-                        ActiveSquare newSquare = new ActiveSquare(false, new Position(i, j));
-                        listOfSquares.Add(newSquare);
-                        Controls.Add(newSquare);
-                    }
-                    
-                }
-            }
         }
     }
 }

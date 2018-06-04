@@ -40,9 +40,6 @@ namespace checkers
 
         public void Start()
         {
-            // Test MainGame window
-            MainGame mainGame = new MainGame(m_Board.BoardMatrix);
-            mainGame.ShowDialog();
             
             // Get the game settings from the user
             GameSettingsForm gameSettings = new GameSettingsForm();
@@ -53,6 +50,8 @@ namespace checkers
                 r_Player2.Name = gameSettings.Player2Name;
                 r_Player2.PlayerType = gameSettings.Player2Type;
             }
+            
+            // Test MainGame window
 
             bool continuePlaying = true;
 
@@ -76,6 +75,9 @@ namespace checkers
             r_Player2.ClearMoveHistory();
             m_CurrentPlayer = r_Player1;
             Move previousMove = null;
+
+            MainGame mainGame = new MainGame(m_Board.BoardMatrix);
+            mainGame.ShowDialog();
 
             while (gameStatus == eGameStatus.Playing)
             {
