@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 using checkersGUI;
 
@@ -189,7 +190,7 @@ namespace checkers
             // 
             this.textBoxPlayer2Name.Enabled = false;
             this.textBoxPlayer2Name.Location = new System.Drawing.Point(115, 130);
-            this.textBoxPlayer2Name.MaxLength = 20;
+            this.textBoxPlayer2Name.MaxLength = MainGame.k_MaxNameSize;
             this.textBoxPlayer2Name.Name = "textBoxPlayer2Name";
             this.textBoxPlayer2Name.Size = new System.Drawing.Size(100, 23);
             this.textBoxPlayer2Name.TabIndex = 7;
@@ -198,7 +199,7 @@ namespace checkers
             // textBoxPlayer1Name
             // 
             this.textBoxPlayer1Name.Location = new System.Drawing.Point(115, 100);
-            this.textBoxPlayer1Name.MaxLength = 20;
+            this.textBoxPlayer1Name.MaxLength = MainGame.k_MaxNameSize;
             this.textBoxPlayer1Name.Name = "textBoxPlayer1Name";
             this.textBoxPlayer1Name.Size = new System.Drawing.Size(100, 23);
             this.textBoxPlayer1Name.TabIndex = 8;
@@ -256,8 +257,18 @@ namespace checkers
 
         private void submitSettings_Click(object sender, System.EventArgs e)
         {
-            this.DialogResult = DialogResult.OK;
-            this.Close();
+            // Check if one of the textboxes is empty
+            if (textBoxPlayer1Name.Text == String.Empty || 
+                textBoxPlayer2Name.Text == String.Empty)
+            {
+                MessageBox.Show("Both player names must be filled!", "Error", MessageBoxButtons.OK);
+            }
+            else
+            {
+                DialogResult = DialogResult.OK;
+                Close();
+            }
+
         }
     }
 }

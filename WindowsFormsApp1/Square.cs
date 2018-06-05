@@ -6,29 +6,37 @@ namespace checkersGUI
 {
     public class Square : Button
     {
-        private Position m_Position;
-        private bool m_Active;
+        private bool m_Active; // TODO: Relevant? Use Enabled?
         private bool m_Clicked;
+        private Position m_Position;
+        private PieceGUI m_PieceGUI;
+
+        public PieceGUI PieceGUI
+        {
+            get => m_PieceGUI;
+            set => m_PieceGUI = value;
+        }
 
         public Square(Position i_Position)
         {
             m_Active = false;
             m_Clicked = false;
             m_Position = i_Position;
-            InitializeComponent();
+            PieceGUI = null;
+            initializeComponent();
         }
 
-        private void InitializeComponent()
+        private void initializeComponent()
         {
             SuspendLayout();
-            Top = m_Position.Row * BoardGUI.k_ButtonSize;
-            Left = m_Position.Col * BoardGUI.k_ButtonSize;
+            Enabled = false;
+            Top = m_Position.Row * MainGame.k_ButtonSize;
+            Left = m_Position.Col * MainGame.k_ButtonSize;
             Name = "Square" + m_Position.Row + m_Position.Col;
-            Size = new System.Drawing.Size(BoardGUI.k_ButtonSize, BoardGUI.k_ButtonSize);
-            BackColor = Color.Black;
-            ForeColor = Color.White;
+            Width = MainGame.k_ButtonSize;
+            Height = Width;
             BackgroundImage = Properties.Resources.back1;
-            Text = "X";
+            BackgroundImageLayout = ImageLayout.Stretch;
             Click += square_Click;
         }
 
@@ -54,6 +62,11 @@ namespace checkersGUI
         private void onSecondClick()
         {
             BackColor = Color.Black;
+        }
+
+        public void AssignPiece(PieceGUI i_PieceGui)
+        {
+            m_PieceGUI = i_PieceGui;
         }
     }
 

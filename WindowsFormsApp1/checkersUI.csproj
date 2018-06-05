@@ -39,7 +39,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BoardGUI.cs">
+    <Compile Include="Board.cs" />
+    <Compile Include="GroupboxBoardGUI.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="FormGameSettings.cs">
