@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Text;
 using checkers;
 
 namespace checkersGUI
@@ -21,16 +24,21 @@ namespace checkersGUI
             Medium = 8,
             Large = 10
         }
+
         // Game Settings
         internal const int k_MaxNameSize = 20;
         internal const int k_ButtonSize = 50;
 
-
         // MainGame Form Controls
         private FormGameSettings formGameSettings;
-        private Label labelPlayer2Score;
+        private Label labelPlayer1Name;
+        private Label labelPlayer2Name;
         private Label labelPlayer1Score;
+        private Label labelPlayer2Score;
         private GroupboxBoardGUI groupboxBoardGui;
+
+        // Default UI Settings
+        private readonly Font defaultFont = new Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
 
         // Game Variables 
         private readonly Player r_Player1;
@@ -38,6 +46,7 @@ namespace checkersGUI
         private Board m_Board;
         private int m_BoardSize;
         private Player m_CurrentPlayer;
+        private List<Move> m_PossibleMove;
 
         public MainGame()
         {
@@ -52,12 +61,13 @@ namespace checkersGUI
             getUserSettings();
             initGame();
             initializeComponent();
-            playGame();
+            getMove();
         }
         
         private void initGame()
         {
             m_Board = new Board(m_BoardSize);
+            m_Board.LabelPointsListener += UpdatePointsLabel;
             eGameStatus gameStatus = eGameStatus.Playing;
             ePlayerPosition winner = ePlayerPosition.BottomPlayer;
             r_Player1.ClearMoveHistory();
@@ -79,48 +89,74 @@ namespace checkersGUI
             }
             else
             {
-                // Close the entire app
+                // TODO: Close the entire app
             }
         }
 
         private void initializeComponent()
         {
+            labelPlayer1Name = new Label();
+            labelPlayer2Name = new Label();
             labelPlayer1Score = new Label();
             labelPlayer2Score = new Label();
             groupboxBoardGui = new GroupboxBoardGUI(m_Board);
             SuspendLayout();
 
+            // labelPlayer1Name
+            labelPlayer1Name.Width = 110;
+            labelPlayer1Name.Height = 20;
+            labelPlayer1Name.Top = 15;
+            labelPlayer1Name.Font = defaultFont;
+            labelPlayer1Name.TextAlign = ContentAlignment.MiddleCenter;
+            labelPlayer1Name.Name = "labelPlayer1Name";
+            labelPlayer1Name.Text = string.Format("{0}:", r_Player1.Name);
+
+            // labelPlayer2Name
+            labelPlayer2Name.Width = labelPlayer1Name.Width;
+            labelPlayer2Name.Height = labelPlayer1Name.Height;
+            labelPlayer2Name.Top = labelPlayer1Name.Top;
+            labelPlayer2Name.Font = defaultFont;
+            labelPlayer2Name.TextAlign = ContentAlignment.MiddleCenter;
+            labelPlayer2Name.Name = "labelPlayer2Name";
+            labelPlayer2Name.Text = string.Format("{0}:", r_Player2.Name);
+
             // labelPlayer1Score
-            labelPlayer1Score.AutoSize = true;
-            labelPlayer1Score.Top = 15;
-            labelPlayer1Score.Left = groupboxBoardGui.Width / 4;
-            labelPlayer1Score.Name = "labelPlayer1Score";
-            labelPlayer1Score.Size = new Size(91, 13); // Todo: change to height/width
-            labelPlayer1Score.TabIndex = 0;
-            labelPlayer1Score.Text = "Player 1: <Score>";
+            labelPlayer1Score.Width = 50;
+            labelPlayer1Score.Height = 20;
+            labelPlayer1Score.Top = labelPlayer1Name.Top + 25;
+            labelPlayer1Score.Font = defaultFont;
+            labelPlayer1Score.TextAlign = ContentAlignment.MiddleCenter;
+            labelPlayer1Score.Text = m_Board.GetPlayerScore(ePlayerPosition.BottomPlayer).ToString();
 
             // labelPlayer2Score
-            labelPlayer2Score.AutoSize = true;
+            labelPlayer2Score.Width = 50;
+            labelPlayer2Score.Height = 20;
             labelPlayer2Score.Top = labelPlayer1Score.Top;
-            labelPlayer2Score.Left = groupboxBoardGui.Width * 3 / 4;
-            labelPlayer2Score.Name = "labelPlayer2Score";
-            labelPlayer2Score.Size = new Size(91, 13); // Todo: change to height/width
-            labelPlayer2Score.TabIndex = 1;
-            labelPlayer2Score.Text = "Player 2: <Score>";
+            labelPlayer2Score.Font = defaultFont;
+            labelPlayer2Score.TextAlign = ContentAlignment.MiddleCenter;
+            labelPlayer2Score.Text = m_Board.GetPlayerScore(ePlayerPosition.TopPlayer).ToString();
 
             // boardGui
-            groupboxBoardGui.Top = 50;
+            groupboxBoardGui.Top = 75;
             groupboxBoardGui.Left = 30;
+    
+            // Position the elements
+            labelPlayer1Name.Left = groupboxBoardGui.Left + (groupboxBoardGui.Width / 4) - (labelPlayer1Name.Width / 2);
+            labelPlayer2Name.Left = groupboxBoardGui.Left + (groupboxBoardGui.Width * 3 / 4) - (labelPlayer2Name.Width / 2);
+            labelPlayer1Score.Left = labelPlayer1Name.Left + labelPlayer1Score.Width / 2;
+            labelPlayer2Score.Left = labelPlayer2Name.Left + labelPlayer2Score.Width / 2;
 
             // MainGame
             // Add all Controls
-            Controls.Add(this.labelPlayer2Score);
-            Controls.Add(this.labelPlayer1Score);
+            Controls.Add(this.labelPlayer2Name);
+            Controls.Add(this.labelPlayer1Name);
+            Controls.Add(labelPlayer1Score);
+            Controls.Add(labelPlayer2Score);
             Controls.Add(groupboxBoardGui);
 
             // MainGame properties
             Width = groupboxBoardGui.Width + 70;
-            Height = groupboxBoardGui.Height + 100;
+            Height = groupboxBoardGui.Height + 130;
             Name = "MainGame";
             Text = "Damka";
             StartPosition = FormStartPosition.CenterScreen;
@@ -128,57 +164,118 @@ namespace checkersGUI
             PerformLayout();
         }
 
-        private void playGame()
+        private void getMove()
         {
-            eGameStatus gameStatus = eGameStatus.Playing;
-            ePlayerPosition winner = ePlayerPosition.BottomPlayer;
-            r_Player1.ClearMoveHistory();
-            r_Player2.ClearMoveHistory();
-            m_CurrentPlayer = r_Player1;
-            Move previousMove = null;
-
-            while (gameStatus == eGameStatus.Playing)
-            {
-                // Get a players move and preform it
-                Move currentMove = getMove(out Move.eMoveStatus currentMoveStatus);
-                m_CurrentPlayer.AddMove(currentMove);
-
-                // If the player can not preform another jump, change player
-                if (currentMoveStatus == Move.eMoveStatus.AnotherJumpPossible)
-                {
-                    previousMove = m_CurrentPlayer.GetLastMove();
-                }
-                else
-                {
-                    changeActivePlayer();
-                    previousMove = null;
-                }
-
-                gameStatus = m_Board.GetGameStatus(m_CurrentPlayer, out winner);
-            }
-        }
-
-        private Move getMove(out Move.eMoveStatus o_CurrentMoveStatus)
-        {
-            o_CurrentMoveStatus = checkersGUI.Move.eMoveStatus.AnotherJumpPossible;
-            Move newMove = null;
+            Debug.WriteLine(m_CurrentPlayer.PlayerPosition);
             Move previousMove = m_CurrentPlayer.GetLastMove();
             if (m_CurrentPlayer.PlayerType == Player.ePlayerType.Human)
             {
-                
+                m_PossibleMove = m_Board.GetPossibleMoves(m_CurrentPlayer.PlayerPosition, m_CurrentPlayer.GetLastMove());
+                Debug.WriteLine("Possible moves " + m_PossibleMove);
             }
             else
             {
-                newMove = m_Board.GetRandomMove(m_CurrentPlayer.PlayerPosition, previousMove);
-                m_Board.MovePiece(ref newMove, previousMove, out o_CurrentMoveStatus);
+                Debug.WriteLine("Computer makes a move");
+                Move newMove = m_Board.GetRandomMove(m_CurrentPlayer.PlayerPosition, previousMove);
+                PreformMove(newMove.Begin, newMove.End);
             }
-            
-            return newMove;
+        }
+
+        public void PreformMove(Position i_Start, Position i_End)
+        {
+            Move newMove = new Move(i_Start, i_End, m_CurrentPlayer.PlayerPosition);
+            m_Board.MovePiece(ref newMove, m_CurrentPlayer.GetLastMove(), out checkersGUI.Move.eMoveStatus moveStatus);
+            if (moveStatus == checkersGUI.Move.eMoveStatus.Illegal)
+            {
+                Debug.WriteLine("Error handling move");
+            }
+            else
+            {
+                Debug.WriteLine("Move the pieceGUI");
+                Square startSquare = groupboxBoardGui.BoardMatrixGui[i_Start.Row, i_Start.Col];
+                Square endSquare = groupboxBoardGui.BoardMatrixGui[i_End.Row, i_End.Col];
+                if (startSquare.PieceGUI != null)
+                {
+                    startSquare.PieceGUI.MovePiece(endSquare);
+                    if (endSquare.Position.Row == 0 || endSquare.Position.Row == m_BoardSize -1)
+                    {
+                        endSquare.setKing();
+                    }
+                }
+
+                if (moveStatus != checkersGUI.Move.eMoveStatus.AnotherJumpPossible)
+                {
+
+                    changeActivePlayer();
+                }
+            }
+
+            checkGameStatus();
+        }
+
+        private void checkGameStatus()
+        {
+            Debug.WriteLine("Check game status");
+            eGameStatus gameStatus = m_Board.GetGameStatus(m_CurrentPlayer, out ePlayerPosition winner);
+            if (gameStatus == eGameStatus.Playing)
+            {
+                Debug.WriteLine("Another round! Hurray!");
+                getMove();
+            }
+            else
+            {
+                Debug.WriteLine("Game end " + gameStatus);
+                concludeSingleGame(gameStatus, winner);
+            }
         }
 
         private void changeActivePlayer()
         {
             m_CurrentPlayer = (m_CurrentPlayer == r_Player1) ? r_Player2 : r_Player1;
+        }
+
+        private void concludeSingleGame(eGameStatus i_GameStatus, ePlayerPosition i_Winner)
+        {
+            int player1Points = m_Board.GetPlayerScore(r_Player1.PlayerPosition);
+            int player2Points = m_Board.GetPlayerScore(r_Player2.PlayerPosition);
+
+            StringBuilder endGame = new StringBuilder();
+
+            switch (i_GameStatus)
+            {
+                case eGameStatus.Draw:
+                    endGame.Append("Game has ended in a draw!");
+                    break;
+                case eGameStatus.Win:
+                    string winner = (r_Player1.PlayerPosition == i_Winner) ? r_Player1.Name : r_Player2.Name;
+                    endGame.Append(string.Format("{0} has won!", winner));
+                    break;
+            }
+
+            endGame.Append(Environment.NewLine);
+            endGame.Append("Player another game?");
+
+            r_Player1.Points += player1Points;
+            r_Player2.Points += player2Points;
+
+            if (MessageBox.Show(endGame.ToString(), "Game Over", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                Debug.WriteLine("Player another game");
+                initGame();
+                groupboxBoardGui.NewBoard(m_Board);
+                getMove();
+            }
+            else
+            {
+                Debug.WriteLine("Thank you for playing!");
+                // Close the app
+            }
+        }
+
+        public void UpdatePointsLabel()
+        {
+            labelPlayer1Score.Text = m_Board.GetPlayerScore(ePlayerPosition.BottomPlayer).ToString();
+            labelPlayer2Score.Text = m_Board.GetPlayerScore(ePlayerPosition.TopPlayer).ToString();
         }
     }
 }

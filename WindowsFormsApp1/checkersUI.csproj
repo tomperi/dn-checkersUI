@@ -100,13 +100,13 @@
     <None Include="Resources\player2regular.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\back1.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\back2.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\player1king.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\choosenTile.png" />
+    <Content Include="Resources\darkTile.png" />
+    <Content Include="Resources\lightTile.png" />
+    <Content Include="Resources\moveableTile.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

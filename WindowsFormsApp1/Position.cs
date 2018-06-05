@@ -29,7 +29,7 @@
 
         public override string ToString()
         {
-            return string.Format(r_Col + " " + r_Row);
+            return string.Format(r_Row + " " + r_Col);
         }
     }
 }

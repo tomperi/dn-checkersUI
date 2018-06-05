@@ -21,7 +21,7 @@ namespace checkersGUI
             Name = "Square" + m_Position.Row + m_Position.Col;
             Size = new System.Drawing.Size(MainGame.k_ButtonSize, MainGame.k_ButtonSize);
             BackColor = Color.White;
-            BackgroundImage = Properties.Resources.back2;
+            BackgroundImage = Properties.Resources.darkTile;
             BackgroundImageLayout = ImageLayout.Stretch;
             Enabled = false;
         }

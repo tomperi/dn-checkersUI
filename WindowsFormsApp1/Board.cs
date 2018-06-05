@@ -1,8 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 
 namespace checkersGUI
 {
+    public delegate void MoveListener(List<Move> i_ListOfMoves);
+
+    public delegate void PositionListener(Position i_Position);
+
+    public delegate void PointsListener();
+
     public class Board
     {
         public enum eSquareStatus
@@ -23,6 +30,13 @@ namespace checkersGUI
         private bool m_PlayerHasForfit;
         private int m_TopPlayerPoints;
 
+        public event MoveListener MoveStartListener;
+
+        public event PositionListener RemovePieceListener;
+
+        public event PointsListener LabelPointsListener;
+        
+
         public Board()
             : this(8)
         {
@@ -30,6 +44,7 @@ namespace checkersGUI
 
         public Board(int i_Size)
         {
+            // Create relevant delegates
             // Create a new board of specific size, init it with pieces 
             r_Size = i_Size;
             r_BoardMatrix = new Piece[r_Size, r_Size];
@@ -37,16 +52,6 @@ namespace checkersGUI
             m_BottomPlayerPoints = 0;
             initBoard();
         }
-
-        /* TODO: Delete this
-        private Board(Piece[,] i_BoardMatrix, int i_TopPlayerPoints, int i_BottomPlayerPoints)
-        {
-            r_BoardMatrix = i_BoardMatrix;
-            r_Size = r_BoardMatrix.Length;
-            m_TopPlayerPoints = i_TopPlayerPoints;
-            m_BottomPlayerPoints = i_BottomPlayerPoints;
-        }
-        */
 
         private static bool notJump(Move i_Movemove)
         {
@@ -92,7 +97,7 @@ namespace checkersGUI
                 if (io_Move.Type == Move.eMoveType.Jump)
                 {
                     removedJumpedOverPiece(io_Move);
-                    if (isJumpPossible(possibleMovesForPiece(io_Move.End), out List<Move> jumpsList))
+                    if (isJumpPossible(PossibleMovesForPiece(io_Move.End), out List<Move> jumpsList))
                     {
                         o_MoveStatus = Move.eMoveStatus.AnotherJumpPossible;
                     }
@@ -119,6 +124,7 @@ namespace checkersGUI
             changePoints(r_BoardMatrix[row, col].PlayerPosition, -numOfPoints);
 
             r_BoardMatrix[row, col] = null;
+            RemovePieceListener?.Invoke(new Position(row, col));
         }
 
         private void changePoints(ePlayerPosition i_Player, int i_NumOfPoints)
@@ -131,6 +137,8 @@ namespace checkersGUI
             {
                 m_TopPlayerPoints += i_NumOfPoints;
             }
+
+            LabelPointsListener?.Invoke();
         }
 
         private void checkKing(Position i_Position)
@@ -180,7 +188,7 @@ namespace checkersGUI
             // If the last move was a jump, first check if another jump is possible for that piece
             if (i_LastMove != null && i_LastMove.Type == Move.eMoveType.Jump)
             {
-                possibleMoves = possibleMovesForPiece(i_LastMove.End);
+                possibleMoves = PossibleMovesForPiece(i_LastMove.End);
                 if (possibleMoves != null)
                 {
                     possibleMoves.RemoveAll(notJump);
@@ -201,7 +209,7 @@ namespace checkersGUI
                         // If the piece belongs to the current player, check the possible moves for it
                         if (r_BoardMatrix[i, j] != null && r_BoardMatrix[i, j].PlayerPosition == i_CurrentPlayer)
                         {
-                            possibleMoves?.AddRange(possibleMovesForPiece(new Position(i, j)));
+                            possibleMoves?.AddRange(PossibleMovesForPiece(new Position(i, j)));
                         }
                     }
                 }
@@ -210,6 +218,11 @@ namespace checkersGUI
                 {
                     possibleMoves = onlyJumps;
                 }
+            }
+
+            if (MoveStartListener != null)
+            {
+                MoveStartListener(possibleMoves);
             }
 
             return possibleMoves;
@@ -235,7 +248,7 @@ namespace checkersGUI
             return jumpPossible;
         }
 
-        private List<Move> possibleMovesForPiece(Position i_PiecePosition)
+        public List<Move> PossibleMovesForPiece(Position i_PiecePosition)
         {
             Piece currentPiece = r_BoardMatrix[i_PiecePosition.Row, i_PiecePosition.Col];
             List<Move> possibleMovesForPiece = new List<Move>();

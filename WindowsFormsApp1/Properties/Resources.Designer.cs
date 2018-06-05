@@ -63,9 +63,9 @@ namespace checkersGUI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap back1 {
+        internal static System.Drawing.Bitmap choosenTile {
             get {
-                object obj = ResourceManager.GetObject("back1", resourceCulture);
+                object obj = ResourceManager.GetObject("choosenTile", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -73,9 +73,29 @@ namespace checkersGUI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap back2 {
+        internal static System.Drawing.Bitmap darkTile {
             get {
-                object obj = ResourceManager.GetObject("back2", resourceCulture);
+                object obj = ResourceManager.GetObject("darkTile", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap lightTile {
+            get {
+                object obj = ResourceManager.GetObject("lightTile", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap moveableTile {
+            get {
+                object obj = ResourceManager.GetObject("moveableTile", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
