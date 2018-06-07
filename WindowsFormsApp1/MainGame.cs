@@ -47,6 +47,7 @@ namespace checkersGUI
         private int m_BoardSize;
         private Player m_CurrentPlayer;
         private List<Move> m_PossibleMove;
+        private bool m_CloseGame;
 
         public MainGame()
         {
@@ -74,6 +75,7 @@ namespace checkersGUI
             r_Player2.ClearMoveHistory();
             m_CurrentPlayer = r_Player1;
             Move previousMove = null;
+            m_CloseGame = false;
         }
 
         private void getUserSettings()
@@ -90,6 +92,7 @@ namespace checkersGUI
             else
             {
                 // TODO: Close the entire app
+                m_CloseGame = true;
                 Close();
             }
         }
@@ -214,6 +217,23 @@ namespace checkersGUI
             checkGameStatus();
         }
 
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        { 
+            base.OnFormClosing(e);
+
+            Debug.WriteLine(e.CloseReason);
+
+            if (!m_CloseGame &&
+                MessageBox.Show(this, "Are you sure you want to quit?", "Quit Game", MessageBoxButtons.YesNo) == DialogResult.No)
+            {
+                e.Cancel = true;
+            }
+            else
+            {
+                m_CloseGame = false;
+            }
+        }
+
         private void checkGameStatus()
         {
             Debug.WriteLine("Check game status");
@@ -266,17 +286,29 @@ namespace checkersGUI
             if (MessageBox.Show(endGame.ToString(), "Game Over", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 Debug.WriteLine("Player another game");
-                initGame();
-                groupboxBoardGui.NewBoard(m_Board);
-                getMove();
+                playAnotherGame();
             }
             else
             {
-                Debug.WriteLine("Thank you for playing!");
-                MessageBox.Show("Thank you for playing", "Damka", MessageBoxButtons.OK);
-                Close();
+                Debug.Write("Closing the game");
+                closeGame();
                 // Close the app
             }
+        }
+
+        private void closeGame()
+        {
+            m_CloseGame = true;
+            Debug.WriteLine("Thank you for playing!");
+            MessageBox.Show("Thank you for playing", "Damka", MessageBoxButtons.OK);
+            Close();
+        }
+
+        private void playAnotherGame()
+        {
+            initGame();
+            groupboxBoardGui.NewBoard(m_Board);
+            getMove();
         }
 
         public void UpdatePointsLabel()
