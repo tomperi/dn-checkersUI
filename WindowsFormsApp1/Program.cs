@@ -8,7 +8,8 @@ namespace checkersGUI
     {
         static void Main()
         {
-            new MainGame().ShowDialog();
+            MainGame game = new MainGame();
+            game.ShowDialog();
         }
     }
 }

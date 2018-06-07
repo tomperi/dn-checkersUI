@@ -53,10 +53,10 @@ namespace checkersGUI
             r_Player1 = new Player(ePlayerPosition.BottomPlayer);
             r_Player2 = new Player(ePlayerPosition.TopPlayer);
             m_CurrentPlayer = r_Player1;
-            Run();
+            Load += Run;
         }
 
-        public void Run()
+        private void Run(object i_Sender, EventArgs i_E)
         {
             getUserSettings();
             initGame();
@@ -90,6 +90,7 @@ namespace checkersGUI
             else
             {
                 // TODO: Close the entire app
+                Close();
             }
         }
 

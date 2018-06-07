@@ -14,20 +14,20 @@ namespace checkersGUI
         private Position m_StartMove;
         private Position m_EndMove;
 
-        public GroupboxBoardGUI(Board i_Board)
-        {
-            r_BoardMatrixGUI = new Square[i_Board.Size, i_Board.Size];
-            m_Board = i_Board;
-            m_Size = i_Board.Size;
-            initializeComponent();
-        }
-
         public Square[,] BoardMatrixGui
         {
             get
             {
                 return r_BoardMatrixGUI;
             }
+        }
+
+        public GroupboxBoardGUI(Board i_Board)
+        {
+            r_BoardMatrixGUI = new Square[i_Board.Size, i_Board.Size];
+            m_Board = i_Board;
+            m_Size = i_Board.Size;
+            initializeComponent();
         }
 
         private void initializeComponent()
@@ -47,14 +47,16 @@ namespace checkersGUI
                         m_Board.RemovePieceListener += newSquare.removePiece;
                         Controls.Add(newSquare);
 
-                        if (m_Board.BoardMatrix[i, j] != null)
+                        if (m_Board.BoardMatrix[i, j] == null)
                         {
-                            // Create a new piece
-                            PieceGUI newPiece = new PieceGUI(m_Board.BoardMatrix[i, j].PieceSymbol, newSquare);
-                            newSquare.AssignPiece(newPiece);
-                            Controls.Add(newPiece);
-                            newPiece.BringToFront();
+                            continue;
                         }
+
+                        // Create a new piece
+                        PieceGUI newPiece = new PieceGUI(m_Board.BoardMatrix[i, j].PieceSymbol, newSquare);
+                        newSquare.AssignPiece(newPiece);
+                        Controls.Add(newPiece);
+                        newPiece.BringToFront();
                     }
                     else
                     {
