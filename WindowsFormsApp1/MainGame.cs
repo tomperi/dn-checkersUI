@@ -239,6 +239,9 @@ namespace checkersGUI
             int player1Points = m_Board.GetPlayerScore(r_Player1.PlayerPosition);
             int player2Points = m_Board.GetPlayerScore(r_Player2.PlayerPosition);
 
+            r_Player1.Points += player1Points;
+            r_Player2.Points += player2Points;
+
             StringBuilder endGame = new StringBuilder();
 
             switch (i_GameStatus)
@@ -253,10 +256,11 @@ namespace checkersGUI
             }
 
             endGame.Append(Environment.NewLine);
+            endGame.Append("Total number of points so far - ");
+            endGame.Append(Environment.NewLine);
+            endGame.Append(string.Format("{0} : {1} --- {2} : {3}", r_Player1.Name, r_Player1.Points, r_Player2.Name, r_Player2.Points));
+            endGame.Append(Environment.NewLine);
             endGame.Append("Player another game?");
-
-            r_Player1.Points += player1Points;
-            r_Player2.Points += player2Points;
 
             if (MessageBox.Show(endGame.ToString(), "Game Over", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
@@ -268,6 +272,8 @@ namespace checkersGUI
             else
             {
                 Debug.WriteLine("Thank you for playing!");
+                MessageBox.Show("Thank you for playing", "Damka", MessageBoxButtons.OK);
+                Close();
                 // Close the app
             }
         }

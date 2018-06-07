@@ -40,7 +40,6 @@ namespace checkersGUI
                     if (i % 2 + j % 2 == 1)
                     {
                         // Create an empty button
-                        // TODO: Merge both squares into one class
                         Square newSquare = new Square(new Position(i, j), true);
                         newSquare.Click += squareClicked;
                         r_BoardMatrixGUI[i, j] = newSquare;
