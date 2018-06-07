@@ -87,7 +87,6 @@ namespace checkersGUI
             }
             else
             {
-                // TODO: Close the entire app
                 m_CloseGame = true;
                 Close();
             }
@@ -189,7 +188,7 @@ namespace checkersGUI
         {
             Move newMove = new Move(i_Start, i_End, m_CurrentPlayer.PlayerPosition);
             m_Board.MovePiece(ref newMove, m_CurrentPlayer.GetLastMove(), out Move.eMoveStatus moveStatus);
-            if (moveStatus != checkersGUI.Move.eMoveStatus.Illegal)
+            if (moveStatus == checkersGUI.Move.eMoveStatus.Illegal)
             {
                 Debug.WriteLine("Error handling move");
             }
