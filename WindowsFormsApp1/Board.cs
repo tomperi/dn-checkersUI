@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
 
 namespace checkersGUI
 {
@@ -36,7 +35,6 @@ namespace checkersGUI
 
         public event PointsListener LabelPointsListener;
         
-
         public Board()
             : this(8)
         {
@@ -77,11 +75,13 @@ namespace checkersGUI
                         m_TopPlayerPoints += k_RegularPointsWorth;
                     }
 
-                    if (i >= bottomPlayerArea && (i % 2) + (j % 2) == 1)
+                    if (i < bottomPlayerArea || (i % 2) + (j % 2) != 1)
                     {
-                        r_BoardMatrix[i, j] = new Piece(ePlayerPosition.BottomPlayer);
-                        m_BottomPlayerPoints += k_RegularPointsWorth;
+                        continue;
                     }
+
+                    r_BoardMatrix[i, j] = new Piece(ePlayerPosition.BottomPlayer);
+                    m_BottomPlayerPoints += k_RegularPointsWorth;
                 }
             }
         }
@@ -94,13 +94,15 @@ namespace checkersGUI
                 o_MoveStatus = Move.eMoveStatus.Legal;
                 changePiecePosition(io_Move);
                 checkKing(io_Move.End);
-                if (io_Move.Type == Move.eMoveType.Jump)
+                if (io_Move.Type != Move.eMoveType.Jump)
                 {
-                    removedJumpedOverPiece(io_Move);
-                    if (isJumpPossible(PossibleMovesForPiece(io_Move.End), out List<Move> jumpsList))
-                    {
-                        o_MoveStatus = Move.eMoveStatus.AnotherJumpPossible;
-                    }
+                    return;
+                }
+
+                removedJumpedOverPiece(io_Move);
+                if (isJumpPossible(PossibleMovesForPiece(io_Move.End), out List<Move> jumpsList))
+                {
+                    o_MoveStatus = Move.eMoveStatus.AnotherJumpPossible;
                 }
             }
             else
@@ -165,11 +167,13 @@ namespace checkersGUI
             bool legalMove = false;
             foreach (Move move in possibleMoves)
             {
-                if (move.Begin.Equals(io_Move.Begin) && move.End.Equals(io_Move.End))
+                if (!move.Begin.Equals(io_Move.Begin) || !move.End.Equals(io_Move.End))
                 {
-                    legalMove = true;
-                    io_Move.Type = move.Type;
+                    continue;
                 }
+
+                legalMove = true;
+                io_Move.Type = move.Type;
             }
 
             return legalMove;

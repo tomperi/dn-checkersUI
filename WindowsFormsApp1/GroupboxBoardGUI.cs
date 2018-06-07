@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Data.SqlClient;
 using System.Diagnostics;
-using System.Globalization;
 using System.Windows.Forms;
 
 namespace checkersGUI
 {
-    public class GroupboxBoardGUI : GroupBox
+    public class GroupboxBoardGui : GroupBox
     {
-        private readonly int m_Size;
-        private readonly Square[,] r_BoardMatrixGUI;
+        private readonly int r_Size;
+        private readonly Square[,] r_BoardMatrixGui;
         private Board m_Board;
         private Position m_StartMove;
         private Position m_EndMove;
@@ -18,33 +16,33 @@ namespace checkersGUI
         {
             get
             {
-                return r_BoardMatrixGUI;
+                return r_BoardMatrixGui;
             }
         }
 
-        public GroupboxBoardGUI(Board i_Board)
+        public GroupboxBoardGui(Board i_Board)
         {
-            r_BoardMatrixGUI = new Square[i_Board.Size, i_Board.Size];
+            r_BoardMatrixGui = new Square[i_Board.Size, i_Board.Size];
             m_Board = i_Board;
-            m_Size = i_Board.Size;
+            r_Size = i_Board.Size;
             initializeComponent();
         }
 
         private void initializeComponent()
         {
             // Add a button for every black square on the board
-            for (int i = 0; i < m_Size; i++)
+            for (int i = 0; i < r_Size; i++)
             {
-                for (int j = 0; j < m_Size; j++)
+                for (int j = 0; j < r_Size; j++)
                 {
-                    if (i % 2 + j % 2 == 1)
+                    if ((i % 2) + (j % 2) == 1)
                     {
                         // Create an empty button
                         Square newSquare = new Square(new Position(i, j), true);
                         newSquare.Click += squareClicked;
-                        r_BoardMatrixGUI[i, j] = newSquare;
-                        m_Board.MoveStartListener += newSquare.squareStartPossible;
-                        m_Board.RemovePieceListener += newSquare.removePiece;
+                        r_BoardMatrixGui[i, j] = newSquare;
+                        m_Board.MoveStartListener += newSquare.MoveStartPossible;
+                        m_Board.RemovePieceListener += newSquare.RemovePiece;
                         Controls.Add(newSquare);
 
                         if (m_Board.BoardMatrix[i, j] == null)
@@ -53,7 +51,7 @@ namespace checkersGUI
                         }
 
                         // Create a new piece
-                        PieceGUI newPiece = new PieceGUI(m_Board.BoardMatrix[i, j].PieceSymbol, newSquare);
+                        PieceGui newPiece = new PieceGui(m_Board.BoardMatrix[i, j].PieceSymbol, newSquare);
                         newSquare.AssignPiece(newPiece);
                         Controls.Add(newPiece);
                         newPiece.BringToFront();
@@ -68,21 +66,23 @@ namespace checkersGUI
             }
 
             // Change the group size according to the amount of buttons
-            Width = m_Size * MainGame.k_ButtonSize;
-            Height = m_Size * MainGame.k_ButtonSize; 
+            Width = r_Size * MainGame.k_ButtonSize;
+            Height = r_Size * MainGame.k_ButtonSize; 
         }
 
         public void NewBoard(Board i_Board)
         {
             m_Board = i_Board;
-            foreach (Square square in r_BoardMatrixGUI)
+
+            foreach (Square square in r_BoardMatrixGui)
             {
                 if (square != null)
                 {
                     square.PieceGUI?.Hide();
-                    square?.Hide();
+                    square.Hide();
                 }
             }
+
             initializeComponent();
         }
 
@@ -91,25 +91,27 @@ namespace checkersGUI
             DeactivateAllIrrelevantSquares();
             foreach (Square square in BoardMatrixGui)
             {
-                if (square == i_Sender)
+                if (square != i_Sender)
                 {
-                    if (square.MoveStart)
+                    continue;
+                }
+
+                if (square.MoveStart)
+                {
+                    square.Highlight();
+                    m_StartMove = square.Position;
+                    foreach (Move move in m_Board.PossibleMovesForPiece(square.Position))
                     {
-                        square.Highlight();
-                        m_StartMove = square.Position;
-                        foreach (Move move in m_Board.PossibleMovesForPiece(square.Position))
-                        {
-                            BoardMatrixGui[move.End.Row, move.End.Col].moveEnd();
-                        }
+                        BoardMatrixGui[move.End.Row, move.End.Col].MoveEndPossible();
                     }
-                    else if (square.MoveEnd)
+                }
+                else if (square.MoveEnd)
+                {
+                    m_EndMove = square.Position;
+                    Debug.WriteLine($"Make a move from {m_StartMove} to {m_EndMove}");
+                    if ((Parent as MainGame) != null)
                     {
-                        m_EndMove = square.Position;
-                        Debug.WriteLine($"Make a move from {m_StartMove} to {m_EndMove}");
-                        if ((Parent as MainGame) != null)
-                        {
-                            (Parent as MainGame).PreformMove(m_StartMove, m_EndMove);
-                        }
+                        ((MainGame)Parent).PreformMove(m_StartMove, m_EndMove);
                     }
                 }
             }
@@ -119,19 +121,20 @@ namespace checkersGUI
         {
             foreach (Square square in BoardMatrixGui)
             {
-                if (square != null)
+                if (square == null)
                 {
-                    if (square.MoveStart || square.MoveEnd)
-                    {
-                        square.DefaultBackground();
-                    }
-                    else
-                    {
-                        square.BackToBasic();
-                    }
+                    continue;
+                }
+
+                if (square.MoveStart || square.MoveEnd)
+                {
+                    square.DefaultBackground();
+                }
+                else
+                {
+                    square.BackToBasic();
                 }
             }
-
         }
     }
 }

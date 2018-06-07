@@ -10,21 +10,20 @@ namespace checkersGUI
         public DisabledSquare(Position i_Position)
         {
             m_Position = i_Position;
-            InitializeComponent();
+            initializeComponent();
         }
 
-        private void InitializeComponent()
+        private void initializeComponent()
         {
             SuspendLayout();
             Top = m_Position.Row * MainGame.k_ButtonSize;
             Left = m_Position.Col * MainGame.k_ButtonSize;
             Name = "Square" + m_Position.Row + m_Position.Col;
-            Size = new System.Drawing.Size(MainGame.k_ButtonSize, MainGame.k_ButtonSize);
+            Size = new Size(MainGame.k_ButtonSize, MainGame.k_ButtonSize);
             BackColor = Color.White;
             BackgroundImage = Properties.Resources.darkTile;
             BackgroundImageLayout = ImageLayout.Stretch;
             Enabled = false;
         }
     }
-
 }

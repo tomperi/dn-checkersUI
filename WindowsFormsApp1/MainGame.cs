@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using System.Drawing;
 using System.Text;
-using checkers;
 
 namespace checkersGUI
 {
@@ -35,10 +34,10 @@ namespace checkersGUI
         private Label labelPlayer2Name;
         private Label labelPlayer1Score;
         private Label labelPlayer2Score;
-        private GroupboxBoardGUI groupboxBoardGui;
+        private GroupboxBoardGui groupboxBoardGui;
 
         // Default UI Settings
-        private readonly Font defaultFont = new Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
+        private readonly Font r_DefaultFont = new Font("Microsoft Sans Serif", 11F, FontStyle.Bold, GraphicsUnit.Point, 177);
 
         // Game Variables 
         private readonly Player r_Player1;
@@ -69,12 +68,9 @@ namespace checkersGUI
         {
             m_Board = new Board(m_BoardSize);
             m_Board.LabelPointsListener += UpdatePointsLabel;
-            eGameStatus gameStatus = eGameStatus.Playing;
-            ePlayerPosition winner = ePlayerPosition.BottomPlayer;
             r_Player1.ClearMoveHistory();
             r_Player2.ClearMoveHistory();
             m_CurrentPlayer = r_Player1;
-            Move previousMove = null;
             m_CloseGame = false;
         }
 
@@ -99,18 +95,19 @@ namespace checkersGUI
 
         private void initializeComponent()
         {
+            // Init Components
             labelPlayer1Name = new Label();
             labelPlayer2Name = new Label();
             labelPlayer1Score = new Label();
             labelPlayer2Score = new Label();
-            groupboxBoardGui = new GroupboxBoardGUI(m_Board);
+            groupboxBoardGui = new GroupboxBoardGui(m_Board);
             SuspendLayout();
 
             // labelPlayer1Name
             labelPlayer1Name.Width = 110;
             labelPlayer1Name.Height = 20;
             labelPlayer1Name.Top = 15;
-            labelPlayer1Name.Font = defaultFont;
+            labelPlayer1Name.Font = r_DefaultFont;
             labelPlayer1Name.TextAlign = ContentAlignment.MiddleCenter;
             labelPlayer1Name.Name = "labelPlayer1Name";
             labelPlayer1Name.Text = string.Format("{0}:", r_Player1.Name);
@@ -119,7 +116,7 @@ namespace checkersGUI
             labelPlayer2Name.Width = labelPlayer1Name.Width;
             labelPlayer2Name.Height = labelPlayer1Name.Height;
             labelPlayer2Name.Top = labelPlayer1Name.Top;
-            labelPlayer2Name.Font = defaultFont;
+            labelPlayer2Name.Font = r_DefaultFont;
             labelPlayer2Name.TextAlign = ContentAlignment.MiddleCenter;
             labelPlayer2Name.Name = "labelPlayer2Name";
             labelPlayer2Name.Text = string.Format("{0}:", r_Player2.Name);
@@ -128,7 +125,7 @@ namespace checkersGUI
             labelPlayer1Score.Width = 50;
             labelPlayer1Score.Height = 20;
             labelPlayer1Score.Top = labelPlayer1Name.Top + 25;
-            labelPlayer1Score.Font = defaultFont;
+            labelPlayer1Score.Font = r_DefaultFont;
             labelPlayer1Score.TextAlign = ContentAlignment.MiddleCenter;
             labelPlayer1Score.Text = m_Board.GetPlayerScore(ePlayerPosition.BottomPlayer).ToString();
 
@@ -136,34 +133,37 @@ namespace checkersGUI
             labelPlayer2Score.Width = 50;
             labelPlayer2Score.Height = 20;
             labelPlayer2Score.Top = labelPlayer1Score.Top;
-            labelPlayer2Score.Font = defaultFont;
+            labelPlayer2Score.Font = r_DefaultFont;
             labelPlayer2Score.TextAlign = ContentAlignment.MiddleCenter;
             labelPlayer2Score.Text = m_Board.GetPlayerScore(ePlayerPosition.TopPlayer).ToString();
 
             // boardGui
             groupboxBoardGui.Top = 75;
             groupboxBoardGui.Left = 30;
-    
-            // Position the elements
-            labelPlayer1Name.Left = groupboxBoardGui.Left + (groupboxBoardGui.Width / 4) - (labelPlayer1Name.Width / 2);
-            labelPlayer2Name.Left = groupboxBoardGui.Left + (groupboxBoardGui.Width * 3 / 4) - (labelPlayer2Name.Width / 2);
-            labelPlayer1Score.Left = labelPlayer1Name.Left + labelPlayer1Score.Width / 2;
-            labelPlayer2Score.Left = labelPlayer2Name.Left + labelPlayer2Score.Width / 2;
 
             // MainGame
-            // Add all Controls
-            Controls.Add(this.labelPlayer2Name);
-            Controls.Add(this.labelPlayer1Name);
+            // Position All Components
+            labelPlayer1Name.Left = groupboxBoardGui.Left + (groupboxBoardGui.Width / 4) - (labelPlayer1Name.Width / 2);
+            labelPlayer2Name.Left = groupboxBoardGui.Left + (groupboxBoardGui.Width * 3 / 4) - (labelPlayer2Name.Width / 2);
+            labelPlayer1Score.Left = labelPlayer1Name.Left + (labelPlayer1Score.Width / 2);
+            labelPlayer2Score.Left = labelPlayer2Name.Left + (labelPlayer2Score.Width / 2);
+            
+            // Add All Components
+            Controls.Add(labelPlayer2Name);
+            Controls.Add(labelPlayer1Name);
             Controls.Add(labelPlayer1Score);
             Controls.Add(labelPlayer2Score);
             Controls.Add(groupboxBoardGui);
 
-            // MainGame properties
+            // MainGame Properties
             Width = groupboxBoardGui.Width + 70;
             Height = groupboxBoardGui.Height + 130;
             Name = "MainGame";
             Text = "Damka";
-            StartPosition = FormStartPosition.CenterScreen;
+            MaximizeBox = false;
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            Top = (Screen.PrimaryScreen.Bounds.Height / 2) - (Height * 3 / 4);
+            Left = (Screen.PrimaryScreen.Bounds.Width / 2) - (Width / 2);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -188,8 +188,8 @@ namespace checkersGUI
         public void PreformMove(Position i_Start, Position i_End)
         {
             Move newMove = new Move(i_Start, i_End, m_CurrentPlayer.PlayerPosition);
-            m_Board.MovePiece(ref newMove, m_CurrentPlayer.GetLastMove(), out checkersGUI.Move.eMoveStatus moveStatus);
-            if (moveStatus == checkersGUI.Move.eMoveStatus.Illegal)
+            m_Board.MovePiece(ref newMove, m_CurrentPlayer.GetLastMove(), out Move.eMoveStatus moveStatus);
+            if (moveStatus != checkersGUI.Move.eMoveStatus.Illegal)
             {
                 Debug.WriteLine("Error handling move");
             }
@@ -201,15 +201,14 @@ namespace checkersGUI
                 if (startSquare.PieceGUI != null)
                 {
                     startSquare.PieceGUI.MovePiece(endSquare);
-                    if (endSquare.Position.Row == 0 || endSquare.Position.Row == m_BoardSize -1)
+                    if (endSquare.Position.Row == 0 || endSquare.Position.Row == m_BoardSize - 1)
                     {
-                        endSquare.setKing();
+                        endSquare.SetKing();
                     }
                 }
 
                 if (moveStatus != checkersGUI.Move.eMoveStatus.AnotherJumpPossible)
                 {
-
                     changeActivePlayer();
                 }
             }
@@ -290,9 +289,9 @@ namespace checkersGUI
             }
             else
             {
+                // Close the app
                 Debug.Write("Closing the game");
                 closeGame();
-                // Close the app
             }
         }
 

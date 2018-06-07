@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
-
-namespace checkersGUI
+﻿namespace checkersGUI
 {
-    static class Program
+    public static class Program
     {
-        static void Main()
+        public static void Main()
         {
             MainGame game = new MainGame();
             game.ShowDialog();
